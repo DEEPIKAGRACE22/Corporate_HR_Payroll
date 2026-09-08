@@ -1,0 +1,575 @@
+{
+  "info": {
+    "_postman_id": "807d05cc-1ee1-4822-b8af-954d083041f9",
+    "name": "Corporate HR & Payroll Management System (P04)",
+    "description": "Christ University CIA-3 Project Development - Comprehensive API Collection covering all 13 Functional Modules and Postman Testing Checklist.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "employeeToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "managerToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "adminToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "testEmployeeId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "testLeaveId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Authentication & Onboarding",
+      "item": [
+        {
+          "name": "Login - HR Admin (Christa Fijo)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "var jsonData = pm.response.json();",
+                  "pm.test('Token is returned', function () { pm.expect(jsonData.data.token).to.be.a('string'); });",
+                  "pm.collectionVariables.set('adminToken', jsonData.data.token);",
+                  "pm.collectionVariables.set('token', jsonData.data.token);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@company.com\",\n  \"password\": \"Admin@123\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
+          }
+        },
+        {
+          "name": "Login - Manager (Deepika Grace)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "var jsonData = pm.response.json();",
+                  "pm.collectionVariables.set('managerToken', jsonData.data.token);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"manager@company.com\",\n  \"password\": \"Manager@123\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
+          }
+        },
+        {
+          "name": "Login - Employee (Cyrus David)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "var jsonData = pm.response.json();",
+                  "pm.collectionVariables.set('employeeToken', jsonData.data.token);",
+                  "pm.collectionVariables.set('testEmployeeId', jsonData.data.user._id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"employee@company.com\",\n  \"password\": \"Employee@123\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
+          }
+        },
+        {
+          "name": "HR Registers New Employee (Happy Path 201)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () { pm.response.to.have.status(201); });",
+                  "var res = pm.response.json();",
+                  "pm.test('Response matches format', function () { pm.expect(res.success).to.be.true; pm.expect(res.data).to.have.property('_id'); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Candidate\",\n  \"email\": \"candidate.test@company.com\",\n  \"password\": \"Secret@123\",\n  \"role\": \"Employee\",\n  \"designation\": \"Software Engineer Trainee\",\n  \"baseSalary\": 45000\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/register", "host": ["{{baseUrl}}"], "path": ["auth", "register"] }
+          }
+        },
+        {
+          "name": "Get Authenticated User Profile (/api/auth/me)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/auth/me", "host": ["{{baseUrl}}"], "path": ["auth", "me"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Department Management",
+      "item": [
+        {
+          "name": "List All Departments",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/departments", "host": ["{{baseUrl}}"], "path": ["departments"] }
+          }
+        },
+        {
+          "name": "Create Department (HR Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Quality Assurance & Testing\",\n  \"description\": \"System verification, regression testing, and quality governance.\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/departments", "host": ["{{baseUrl}}"], "path": ["departments"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Daily Attendance Tracking",
+      "item": [
+        {
+          "name": "POST /api/attendance/clockin (Sample from PDF)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () { pm.response.to.have.status(201); });",
+                  "var res = pm.response.json();",
+                  "pm.test('Response matches PDF structure', function () { pm.expect(res.success).to.be.true; pm.expect(res.message).to.eql('Record created successfully'); pm.expect(res.data).to.have.property('_id'); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"employeeId\": \"{{testEmployeeId}}\",\n  \"date\": \"2026-09-01T10:00:00Z\",\n  \"clockIn\": \"09:00:00\",\n  \"status\": \"Present\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/attendance/clockin", "host": ["{{baseUrl}}"], "path": ["attendance", "clockin"] }
+          }
+        },
+        {
+          "name": "Duplicate Clock-in (Business Rule Conflict 400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400', function () { pm.response.to.have.status(400); });",
+                  "var res = pm.response.json();",
+                  "pm.test('Error response contains VALIDATION_ERROR', function () { pm.expect(res.success).to.be.false; pm.expect(res.errorCode).to.eql('VALIDATION_ERROR'); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"employeeId\": \"{{testEmployeeId}}\",\n  \"date\": \"2026-09-01T10:00:00Z\",\n  \"clockIn\": \"09:05:00\",\n  \"status\": \"Present\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/attendance/clockin", "host": ["{{baseUrl}}"], "path": ["attendance", "clockin"] }
+          }
+        },
+        {
+          "name": "POST /api/attendance/clockout (Clock-out)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"employeeId\": \"{{testEmployeeId}}\",\n  \"date\": \"2026-09-01\",\n  \"clockOut\": \"17:30:00\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/attendance/clockout", "host": ["{{baseUrl}}"], "path": ["attendance", "clockout"] }
+          }
+        },
+        {
+          "name": "View My Attendance History",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{employeeToken}}" }],
+            "url": { "raw": "{{baseUrl}}/attendance/my", "host": ["{{baseUrl}}"], "path": ["attendance", "my"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Leave Request & Approval",
+      "item": [
+        {
+          "name": "Apply for Leave (POST /api/leaves)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () { pm.response.to.have.status(201); });",
+                  "var res = pm.response.json();",
+                  "pm.collectionVariables.set('testLeaveId', res.data._id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{employeeToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"casual\",\n  \"fromDate\": \"2026-10-10\",\n  \"toDate\": \"2026-10-11\",\n  \"reason\": \"Personal family matter\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/leaves", "host": ["{{baseUrl}}"], "path": ["leaves"] }
+          }
+        },
+        {
+          "name": "View Pending Leaves (Manager / HR)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{managerToken}}" }],
+            "url": { "raw": "{{baseUrl}}/leaves/pending", "host": ["{{baseUrl}}"], "path": ["leaves", "pending"] }
+          }
+        },
+        {
+          "name": "Manager Decision: Approve Leave (PUT /api/leaves/:id/decision)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "var res = pm.response.json();",
+                  "pm.test('Response matches PDF structure', function () { pm.expect(res.success).to.be.true; pm.expect(res.message).to.eql('Status updated successfully'); pm.expect(res.data.status).to.eql('Approved'); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{managerToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Approved\",\n  \"remarks\": \"Reviewed and confirmed by authorized role\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/leaves/{{testLeaveId}}/decision", "host": ["{{baseUrl}}"], "path": ["leaves", "{{testLeaveId}}", "decision"] }
+          }
+        },
+        {
+          "name": "View Leave Balances (GET /api/leaves/balances/my)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{employeeToken}}" }],
+            "url": { "raw": "{{baseUrl}}/leaves/balances/my", "host": ["{{baseUrl}}"], "path": ["leaves", "balances", "my"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Payroll & Payslips",
+      "item": [
+        {
+          "name": "Run Monthly Payroll (POST /api/payroll/run)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () { pm.response.to.have.status(201); });",
+                  "var res = pm.response.json();",
+                  "pm.test('Payroll computed', function () { pm.expect(res.data.processedCount).to.be.greaterThan(0); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"month\": 9,\n  \"year\": 2026\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/payroll/run", "host": ["{{baseUrl}}"], "path": ["payroll", "run"] }
+          }
+        },
+        {
+          "name": "View Payslip History (GET /api/employees/:id/payslips)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{employeeToken}}" }],
+            "url": { "raw": "{{baseUrl}}/employees/{{testEmployeeId}}/payslips", "host": ["{{baseUrl}}"], "path": ["employees", "{{testEmployeeId}}", "payslips"] }
+          }
+        },
+        {
+          "name": "View All Generated Payrolls (HR Admin)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/payroll/records/all?month=9&year=2026", "host": ["{{baseUrl}}"], "path": ["payroll", "records", "all"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Manager Dashboard & Team",
+      "item": [
+        {
+          "name": "Get Team Members",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{managerToken}}" }],
+            "url": { "raw": "{{baseUrl}}/manager/team", "host": ["{{baseUrl}}"], "path": ["manager", "team"] }
+          }
+        },
+        {
+          "name": "Get Team Today Attendance",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{managerToken}}" }],
+            "url": { "raw": "{{baseUrl}}/manager/team-attendance", "host": ["{{baseUrl}}"], "path": ["manager", "team-attendance"] }
+          }
+        },
+        {
+          "name": "Log Performance Note (POST /api/performance)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{managerToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"employeeId\": \"{{testEmployeeId}}\",\n  \"note\": \"High velocity and proactive peer code reviews.\",\n  \"rating\": 5\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/performance", "host": ["{{baseUrl}}"], "path": ["performance"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. HR Reports & Analytics",
+      "item": [
+        {
+          "name": "GET /api/hr/reports/attendance (Sample from PDF)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "var res = pm.response.json();",
+                  "pm.test('Data is array of departments', function () { pm.expect(res.data).to.be.an('array'); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/hr/reports/attendance", "host": ["{{baseUrl}}"], "path": ["hr", "reports", "attendance"] }
+          }
+        },
+        {
+          "name": "GET /api/hr/reports/payroll-cost",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/hr/reports/payroll-cost", "host": ["{{baseUrl}}"], "path": ["hr", "reports", "payroll-cost"] }
+          }
+        },
+        {
+          "name": "GET /api/hr/reports/summary",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/hr/reports/summary", "host": ["{{baseUrl}}"], "path": ["hr", "reports", "summary"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "8. Error & Edge Case Verification",
+      "item": [
+        {
+          "name": "401 Authentication Failure (No Token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 401', function () { pm.response.to.have.status(401); });",
+                  "var res = pm.response.json();",
+                  "pm.test('Error code is UNAUTHORIZED', function () { pm.expect(res.errorCode).to.eql('UNAUTHORIZED'); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/auth/me", "host": ["{{baseUrl}}"], "path": ["auth", "me"] }
+          }
+        },
+        {
+          "name": "403 Authorization Failure (Employee calling HR route)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 403', function () { pm.response.to.have.status(403); });",
+                  "var res = pm.response.json();",
+                  "pm.test('Error code is FORBIDDEN', function () { pm.expect(res.errorCode).to.eql('FORBIDDEN'); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{employeeToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Hacked Department\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/departments", "host": ["{{baseUrl}}"], "path": ["departments"] }
+          }
+        },
+        {
+          "name": "404 Not Found (Invalid ID)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 404', function () { pm.response.to.have.status(404); });",
+                  "var res = pm.response.json();",
+                  "pm.test('Error code is NOT_FOUND', function () { pm.expect(res.errorCode).to.eql('NOT_FOUND'); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/departments/000000000000000000000000", "host": ["{{baseUrl}}"], "path": ["departments", "000000000000000000000000"] }
+          }
+        },
+        {
+          "name": "400 Validation Failure (Missing Required Fields)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400', function () { pm.response.to.have.status(400); });",
+                  "var res = pm.response.json();",
+                  "pm.test('Error code is VALIDATION_ERROR', function () { pm.expect(res.errorCode).to.eql('VALIDATION_ERROR'); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/register", "host": ["{{baseUrl}}"], "path": ["auth", "register"] }
+          }
+        }
+      ]
+    }
+  ]
+}
