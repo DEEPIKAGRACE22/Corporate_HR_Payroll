@@ -1,0 +1,35 @@
+{
+  "name": "corporate-hr-payroll-system",
+  "version": "1.0.0",
+  "description": "Corporate HR & Payroll Management System (P04 - Christ University CIA-3)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "seed": "node seed/seedData.js",
+    "test": "node test/api.test.js"
+  },
+  "keywords": [
+    "hr-management",
+    "payroll",
+    "attendance",
+    "leaves",
+    "mongodb",
+    "express",
+    "angular",
+    "jwt"
+  ],
+  "author": "Christa Fijo, Deepika Grace, Eliza, Cyrus David",
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.6.0"
+  },
+  "devDependencies": {
+    "mongodb-memory-server": "^10.0.0"
+  }
+}
